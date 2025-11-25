@@ -1,5 +1,8 @@
 import { AppShell, Title } from "@mantine/core";
-import Home from "./Home";
+import CreatePage from "./pages/create-page";
+import { Route, Routes } from "react-router";
+import HomePage from "./pages/home-page";
+import NotFoundPage from "./pages/not-found-page";
 
 
 export default function App() {
@@ -8,7 +11,11 @@ export default function App() {
       <Title className="title-font">PartyVite 🎉</Title>
     </AppShell.Header>
     <AppShell.Main>
-      <Home />
+      <Routes>
+        <Route index element={<HomePage />} />
+        <Route path="/new" element={<CreatePage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
     </AppShell.Main>
   </AppShell >;
 }
