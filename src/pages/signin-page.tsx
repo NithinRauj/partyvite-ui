@@ -1,9 +1,50 @@
 import { isEmail, useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 import { useNavigate, NavLink } from 'react-router';
 import { Button, Container, Flex, PasswordInput, Text, TextInput, Title } from '@mantine/core';
+import { useMutation } from '@tanstack/react-query';
 
 const SigninPage = () => {
+  const signin = async () => {
+    const url = import.meta.env.VITE_SERVER_URL + '/users/signin';
+    const formValues = form.getValues();
+    const formData = new FormData();
+    formData.append('username', formValues.email);
+    formData.append('password', formValues.password);
+
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData,
+    });
+    return res;
+  };
+
   const navigate = useNavigate();
+  const { mutate: signinMutation, isPending } = useMutation({
+    mutationKey: ['signin'],
+    mutationFn: signin,
+    onSuccess: async (data) => {
+      const jsonResponse = await data.json();
+
+      if (data.status === 200) {
+        localStorage.setItem('access_token', jsonResponse.access_token);
+        navigate('/home');
+      } else {
+        notifications.show({
+          color: 'red',
+          title: 'Signin Error',
+          message: 'Invalid Credentials. Please try again',
+        });
+      }
+    },
+    onError: (error) => {
+      notifications.show({
+        color: 'red',
+        title: 'Signin Error',
+        message: error.message,
+      });
+    },
+  });
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -20,7 +61,8 @@ const SigninPage = () => {
   });
 
   const onSignin = () => {
-    navigate('/home');
+    notifications.clean();
+    signinMutation();
   };
 
   return (
@@ -43,7 +85,9 @@ const SigninPage = () => {
             key={form.key('password')}
             {...form.getInputProps('password')}
           />
-          <Button type="submit">Sign In</Button>
+          <Button loading={isPending} type="submit">
+            Sign In
+          </Button>
         </Flex>
       </form>
       <Flex justify={'center'} align={'center'} direction={'column'} gap={'lg'} mt={'xl'}>

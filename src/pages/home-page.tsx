@@ -9,6 +9,7 @@ const HomePage = () => {
       <Link to="/new">
         <Button ml="90%">New Invite</Button>
       </Link>
+      <Button>Sign Out</Button>
       <Flex direction="column" align={'center'}>
         <InviteCard />
         <InviteCard />
